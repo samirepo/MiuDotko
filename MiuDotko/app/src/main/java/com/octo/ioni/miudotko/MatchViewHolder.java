@@ -1,5 +1,7 @@
 package com.octo.ioni.miudotko;
 
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -9,4 +11,6 @@ import android.widget.TextView;
 public class MatchViewHolder {
     protected TextView idTextView;
     protected TextView segTextView;
+    protected Button chooseButton;
+    protected ImageView matchImageView;
 }
