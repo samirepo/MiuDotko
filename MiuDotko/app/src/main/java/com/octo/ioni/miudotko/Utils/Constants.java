@@ -13,4 +13,5 @@ public class Constants {
     public static String playerName = "player_name";
     public static String matchName = "match_name";
     public static String matchID = "match_id";
+    public static String steamIDs = "steamids";
 }

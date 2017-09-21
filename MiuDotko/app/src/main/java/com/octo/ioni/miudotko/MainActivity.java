@@ -45,7 +45,7 @@ public class MainActivity extends DotkoActivity {
     }
 
     private void handleResponse(JSONObject response){
-        Log.d(TAG + ": Response", response.toString());
+
         JSONObject result;
         ArrayList<Match> parsedMatches = new ArrayList<>();
         try {
@@ -68,7 +68,17 @@ public class MainActivity extends DotkoActivity {
                 long matchID = match.getLong("match_id");
                 long matchSEG = match.getLong("match_seq_num");
                 Log.d(TAG, "Found Match: " + matchID + ", and Seg: " + matchSEG);
+
+
                 matches.add(new Match(matchID, matchSEG, -1, -1, -1, -1, new ArrayList<Player>()) );
+
+                /*for (int j = 0; j < match.getJSONArray("players").length(); j++){
+                    JSONObject player = match.getJSONArray("players").getJSONObject(j);
+                    long playerAccountID = player.getLong("account_id");
+                    int playerSlotInMatch = player.getInt("player_slot");
+                    int playerHeroID = player.getInt("hero_id");
+                    requestUserName(playerAccountID);
+                } */
 
             } catch (JSONException e) {
                 Log.e(TAG + ": parseErr", "Json parsing error: " + e.getMessage());
@@ -77,5 +87,15 @@ public class MainActivity extends DotkoActivity {
 
 
         return matches;
+    }
+
+    protected void requestUserName(long accountID32){
+        long accId64 = accountID32 + 76561197960265728L;
+        makeRequest(SteamURLController.url_playerSummaries(Long.toString(accId64)), new DotkoRequestInterface() {
+            @Override
+            public void callback(JSONObject response) {
+                Log.d(TAG, "Profile: " + response);
+            }
+        });
     }
 }

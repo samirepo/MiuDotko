@@ -11,4 +11,8 @@ class URLControllerParameter {
         this.key = key;
         this.value = value;
     }
+
+    String pair(){
+        return this.key + "=" + this.value;
+    }
 }

@@ -52,10 +52,10 @@ public class MatchArrayAdapter extends ArrayAdapter<Match> {
         holder.chooseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Match matchClicked = (Match) view.getTag();   
+                Match matchClicked = (Match) view.getTag();
                 Intent matchActivity = new Intent(getContext(), MatchActivity.class);
-                matchActivity.putExtra("matchID", matchClicked.getMatch_id());
-                matchActivity.putExtra("matchSeq", matchClicked.getMatch_seg());
+                matchActivity.putExtra("matchID", matchClicked.getMatch_id_long());
+                matchActivity.putExtra("matchSeq", matchClicked.getMatch_seg_long());
                 getContext().startActivity(matchActivity);
             }
         });

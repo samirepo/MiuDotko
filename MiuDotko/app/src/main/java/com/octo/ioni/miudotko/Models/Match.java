@@ -31,7 +31,15 @@ public class Match {
         return Long.toString(this.match_id) ;
     }
 
+    public Long getMatch_id_long() {
+        return this.match_id;
+    }
+
     public String getMatch_seg() {
         return Long.toString(this.match_seq_num) ;
+    }
+
+    public Long getMatch_seg_long() {
+        return this.match_seq_num;
     }
 }
