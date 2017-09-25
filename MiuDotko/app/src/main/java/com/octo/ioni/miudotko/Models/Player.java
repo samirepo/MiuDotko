@@ -43,6 +43,11 @@ public class Player {
                 "level": 1
             }
         ]*/
+
+    public Player(long account_id){
+        this.account_id = account_id;
+    }
+
     public Player(
             long account_id,
             int player_slot,
