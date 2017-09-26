@@ -16,12 +16,10 @@ import java.util.ArrayList;
 public class MainActivity extends DotkoActivity {
     String TAG = "MainActivity";
 
-    AppDataController appData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        appData = new AppDataController(this);
 
         makeRequest(SteamURLController.url_matchHistoryLast25("Ioni"), new DotkoRequestInterface() {
             @Override

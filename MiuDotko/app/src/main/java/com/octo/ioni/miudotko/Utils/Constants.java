@@ -9,9 +9,9 @@ public class Constants {
     public static String SteamWebAPIDomain = "ninjatikka.fi";
     public static String SteamWebAPIVersion = "/V001/";
     public static String SteamApiURL = "https://api.steampowered.com/IDOTA2Match_570/"; //GetMatchDetails/V001/?match_id=3453474022&key=8E68DFCFBBCC0DC11378E1AAB7068FA1";
-
     public static String playerName = "player_name";
     public static String matchName = "match_name";
     public static String matchID = "match_id";
     public static String steamIDs = "steamids";
+    //http://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?language=english&key=8E68DFCFBBCC0DC11378E1AAB7068FA1
 }

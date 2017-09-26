@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.octo.ioni.miudotko.Models.Match;
 import com.octo.ioni.miudotko.Models.MatchDetails;
 import com.octo.ioni.miudotko.Models.Player;
+import com.octo.ioni.miudotko.Models.SteamAccount;
 import com.octo.ioni.miudotko.R;
 import com.octo.ioni.miudotko.Utils.SteamURLController;
 
@@ -18,13 +19,16 @@ import java.util.ArrayList;
 
 public class MatchActivity extends DotkoActivity {
 
+    public static String playerSummaryUrl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
+    Long matchID = -1L;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match);
 
         Long defVal = -1L;
-        Long matchID = this.getIntent().getLongExtra("matchID", defVal);
+        matchID = this.getIntent().getLongExtra("matchID", defVal);
         initView(matchID);
 
         makeRequest(SteamURLController.url_matchDetails(Long.toString(matchID)), new DotkoRequestInterface() {
@@ -33,6 +37,8 @@ public class MatchActivity extends DotkoActivity {
                 handleResponse(response);
             }
         });
+
+        fetchPlayerINFO();
     }
 
     private void initView(Long id){
@@ -66,6 +72,10 @@ public class MatchActivity extends DotkoActivity {
         radiantTW5.setText("NaN");
     }
 
+    public void updatePlayerSummaries(ArrayList<SteamAccount> accounts){
+
+    }
+
     private void populateData(MatchDetails mDetails){
         TextView matchid = (TextView) findViewById(R.id.tw_match);
         TextView twrest = (TextView) findViewById(R.id.tw_rest);
@@ -78,6 +88,18 @@ public class MatchActivity extends DotkoActivity {
 
     }
 
+
+    protected boolean fetchPlayerINFO(){
+        makeRequest(playerSummaryUrl + "?" + "steamids=" + appData.steamIDsInMatch(matchID) + "&key=8E68DFCFBBCC0DC11378E1AAB7068FA1", new DotkoRequestInterface() {
+            @Override
+            public void callback(JSONObject response) {
+                Log.d(TAG, "GetPlayerSummaries: " + response);
+                updatePlayerSummaries(parseAccounts(response));
+            }
+        });
+        return true;
+    }
+
     private void handleResponse(JSONObject response){
         Log.d(TAG + ": Response", response.toString());
         try {
@@ -88,6 +110,49 @@ public class MatchActivity extends DotkoActivity {
         } catch (JSONException e) {
             Log.e(TAG, "Json parsing error: " + e.getMessage());
         }
+    }
+
+    protected ArrayList<SteamAccount> parseAccounts(JSONObject response){
+        ArrayList<SteamAccount> accounts = new ArrayList<>();
+        try {
+            JSONObject resp = response.getJSONObject("response");
+            JSONArray accountsArray = resp.getJSONArray("players");
+            for (int i = 0; i < accountsArray.length() - 1; i++){
+                JSONObject account = accountsArray.getJSONObject(i);
+                accounts.add(parseAccountFrom(account));
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "Json parsing error: " + e.getMessage());
+        }
+        return accounts;
+    }
+
+    protected SteamAccount parseAccountFrom(JSONObject json){
+        SteamAccount account = new SteamAccount();
+        try {
+            account = new SteamAccount(
+                    json.getLong("steamid"),
+                    json.getInt("communityvisibilitystate"),
+                    json.getInt("profilestate"),
+                    json.getString("personaname"),
+                    json.getLong("lastlogoff"),
+                    json.getString("profileurl"),
+                    json.getString("avatar"),
+                    json.getString("avatarmedium"),
+                    json.getString("avatarfull"),
+                    json.getInt("personastate"),
+                    json.getString("realname"),
+                    json.getString("primaryclanid"),
+                    json.getLong("timecreated"),
+                    json.getInt("personastateflags"),
+                    json.getString("gameextrainfo"),
+                    json.getString("gameid"),
+                    json.getString("loccountrycode")
+            );
+        } catch (JSONException e) {
+            Log.e(TAG, "Json parsing error: " + e.getMessage());
+        }
+        return account;
     }
 
     private MatchDetails parseMatchDetails(JSONObject json){

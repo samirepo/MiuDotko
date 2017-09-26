@@ -5,9 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import com.octo.ioni.miudotko.DB.MatchesTable;
 import com.octo.ioni.miudotko.Models.Match;
+import com.octo.ioni.miudotko.Models.MatchPlayer;
 import com.octo.ioni.miudotko.Models.Player;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +32,7 @@ public class DotkoDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(MatchesTable.CREATE_MATCHES_TABLE);
         sqLiteDatabase.execSQL(PlayerTable.CREATE_PLAYERS_TABLE);
-        seedMatches(sqLiteDatabase);
+        //seedMatches(sqLiteDatabase);
     }
 
     @Override
@@ -41,7 +48,7 @@ public class DotkoDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = contentValues(match);
         boolean playerInDb = CheckIfDataInDB(db, MatchesTable.TABLE_MATCHES, MatchesTable.KEY_MATCH_ID, Long.toString(match.getMatch_id_long()));
-        if (playerInDb) return false;
+        if (playerInDb) return false; //TODO! Update instead of "not adding"
 
         db.insert(MatchesTable.TABLE_MATCHES, null, values);
         db.close();
@@ -55,12 +62,32 @@ public class DotkoDBHelper extends SQLiteOpenHelper {
         ContentValues values = contentValues(player);
 
         boolean playerInDb = CheckIfDataInDB(db, PlayerTable.TABLE_PLAYERS, PlayerTable.KEY_ACCOUNT_ID, Long.toString(player.getAccount_id()));
-        if (playerInDb) return false;
+        if (playerInDb) return false; //TODO! Update instead of "not adding"
 
         db.insert(PlayerTable.TABLE_PLAYERS, null, values);
         db.close();
         return true;
     }
+
+    public ArrayList<MatchPlayer> playersInMatch(long matchID){
+        ArrayList<MatchPlayer> playerArrayList = new ArrayList<>();
+        Match match = getMatch(matchID);
+
+        String playersJSON = match.getPlayersJSON();
+        try {
+            JSONArray playersOfMatch = new JSONArray(playersJSON);
+            for(int i=0;i<playersOfMatch.length();i++){
+                JSONObject curr = playersOfMatch.getJSONObject(i);
+                MatchPlayer p1 = new MatchPlayer(curr.getLong("account_id"),curr.getInt("player_slot"),curr.getInt("hero_id"));
+                if (!playerArrayList.contains(p1)) playerArrayList.add(p1);
+            }
+        } catch (JSONException e) {
+            Log.e("DotkoDBHelper", "Json parsing error: " + e.getMessage());
+        }
+
+        return playerArrayList;
+    }
+
 
     public Player getPlayer(long id){
         SQLiteDatabase db = this.getReadableDatabase();
